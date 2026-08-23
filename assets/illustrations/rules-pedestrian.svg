@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 110" role="img" aria-labelledby="title">
+  <title id="title">أولوية المشاة</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#eff8f2"/><stop offset="1" stop-color="#dcefe3"/></linearGradient>
+    <linearGradient id="road" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#3d5b4d"/><stop offset="1" stop-color="#213a2e"/></linearGradient>
+  </defs>
+  <rect width="160" height="110" rx="16" fill="url(#bg)"/>
+  <circle cx="135" cy="22" r="25" fill="#087346" opacity=".08"/>
+  <path d="M34 85h92" stroke="#f6fbf8" stroke-width="15" stroke-dasharray="10 7"/><circle cx="80" cy="25" r="9" fill="#173528"/><path d="M80 35v24l-15 13m15-13 16 13m-16-24-12 8m12-8 12 8" fill="none" stroke="#087346" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><path d="M23 92h114" stroke="#3d5b4d" stroke-width="8"/>
+</svg>

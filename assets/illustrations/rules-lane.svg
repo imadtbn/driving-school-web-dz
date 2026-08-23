@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 110" role="img" aria-labelledby="title">
+  <title id="title">تغيير المسار بأمان</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#eff8f2"/><stop offset="1" stop-color="#dcefe3"/></linearGradient>
+    <linearGradient id="road" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#3d5b4d"/><stop offset="1" stop-color="#213a2e"/></linearGradient>
+  </defs>
+  <rect width="160" height="110" rx="16" fill="url(#bg)"/>
+  <circle cx="135" cy="22" r="25" fill="#087346" opacity=".08"/>
+  <path d="M12 110 57 42h46l45 68Z" fill="url(#road)"/><path d="M80 54v56" stroke="#efbd50" stroke-width="4" stroke-dasharray="9 6"/><g transform="translate(42 62)"><path d="M5 25h50v-16l-9-9H20l-8 9H5Z" fill="#0a5273"/><path d="M17 9h28l5 7H12Z" fill="#d7eef2"/><circle cx="16" cy="26" r="6" fill="#173528"/><circle cx="45" cy="26" r="6" fill="#173528"/><circle cx="16" cy="26" r="2" fill="#f5f7f6"/><circle cx="45" cy="26" r="2" fill="#f5f7f6"/></g><g transform="translate(86 44)"><path d="M5 25h50v-16l-9-9H20l-8 9H5Z" fill="#087346"/><path d="M17 9h28l5 7H12Z" fill="#d7eef2"/><circle cx="16" cy="26" r="6" fill="#173528"/><circle cx="45" cy="26" r="6" fill="#173528"/><circle cx="16" cy="26" r="2" fill="#f5f7f6"/><circle cx="45" cy="26" r="2" fill="#f5f7f6"/></g><path d="M50 40q22-18 42 0" fill="none" stroke="#d98c16" stroke-width="4" stroke-linecap="round"/><path d="m92 40-8-4 1 9Z" fill="#d98c16"/>
+</svg>

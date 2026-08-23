@@ -9,3 +9,6 @@
 | `assets/signs/regulatory-c11a-50.svg` | نموذج لإشارة حد السرعة 50 | [SVG regulatory road signs in Algeria](https://commons.wikimedia.org/wiki/Category:SVG_regulatory_road_signs_of_Algeria)، تم التحقق بصرياً من الرقم والشكل التنظيمي. |
 
 يعرض الموقع هذه الأصول لأغراض التعليم والتوعية. لا تشير أي نسبة إلى أن مالكي الصور أو المصادر يدعمون الموقع.
+
+| `assets/images/safety-driving-hero.webp` | صورة Hero لصفحة السلامة: مركبة على طريق تحيط به الأشجار | [Car driving along a road surrounded by trees](https://commons.wikimedia.org/wiki/File:Car_driving_along_a_road_surrounded_by_trees.jpg)، Etha، [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/). تم تصغير الصورة وتحويلها إلى WebP. |
+| `assets/images/rules-driving-hero.webp` | صورة Hero لصفحة قواعد السير: قيادة مركبة على الطريق | [Driving car on a road](https://commons.wikimedia.org/wiki/File:Driving_car_on_a_road.jpg)، Tenasan، [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). تم تصغير الصورة وتحويلها إلى WebP. |

@@ -24,7 +24,7 @@ function header(active = '') {
     <a class="brand" href="index.html" aria-label="دليل السياقة DZ، الصفحة الرئيسية"><span class="brand-mark" aria-hidden="true">د</span><span><strong class="brand-title">دليل السياقة</strong><small class="brand-subtitle">DZ</small></span></a>
     <button class="menu-toggle" type="button" aria-label="فتح القائمة" aria-expanded="false" aria-controls="primary-navigation"><span></span><span></span><span></span></button>
     <nav id="primary-navigation" class="primary-nav" aria-label="التنقل الرئيس"><ul>${nav}</ul></nav>
-    <a class="header-cta" href="quiz.html">ابدأ اختباراً</a>
+    <a class="header-cta" href="exam-simulation.html">محاكاة الامتحان</a>
   </div>
 </header>`;
 }
@@ -33,7 +33,7 @@ function footer() {
   return `<footer class="site-footer">
   <div class="container footer-grid">
     <section><p class="footer-brand">دليل السياقة <span>DZ</span></p><p>منصة عربية تعليمية لفهم إشارات المرور ومبادئ القيادة الآمنة في الجزائر.</p><p>المحتوى للتوعية والتدريب ولا يغني عن اللوائح والتنبيهات الصادرة من الجهات المختصة.</p></section>
-    <section><h2>تعلّم</h2><ul><li><a href="signals.html">تصنيفات الإشارات</a></li><li><a href="rules.html">قواعد السير</a></li><li><a href="safety.html">نصائح السلامة</a></li><li><a href="quiz.html">اختبارات الفئات</a></li></ul></section>
+    <section><h2>تعلّم</h2><ul><li><a href="signals.html">تصنيفات الإشارات</a></li><li><a href="rules.html">قواعد السير</a></li><li><a href="safety.html">نصائح السلامة</a></li><li><a href="quiz.html">اختبارات الفئات</a></li><li><a href="exam-simulation.html">محاكاة الامتحان</a></li></ul></section>
     <section><h2>الموقع</h2><ul><li><a href="about.html">من نحن</a></li><li><a href="contact.html">اتصل بنا</a></li><li><a href="privacy.html">سياسة الخصوصية</a></li><li><a href="disclaimer.html">إخلاء المسؤولية</a></li><li><a href="sources.html">مصادر الصور</a></li></ul></section>
   </div>
   <div class="container footer-bottom"><p>© ${year} دليل السياقة DZ. طريق أكثر أماناً يبدأ بمعرفة أوضح.</p></div>
@@ -42,9 +42,7 @@ function footer() {
 
 function head({ title, description, file, type = 'website' }) {
   const canonical = file === 'index.html' ? `${siteUrl}/` : `${siteUrl}/${file}`;
-  const schema = JSON.stringify({
-    '@context': 'https://schema.org',
-    '@graph': [
+  const graph = [
       {
         '@type': 'EducationalOrganization',
         '@id': `${siteUrl}/#organization`,
@@ -61,10 +59,24 @@ function head({ title, description, file, type = 'website' }) {
         name: title,
         description,
         inLanguage: 'ar-DZ',
-        isPartOf: { '@id': `${siteUrl}/#organization` }
+        isPartOf: { '@id': `${siteUrl}/#organization` },
+        primaryImageOfPage: `${siteUrl}/assets/social-cover.png`
       }
-    ]
-  });
+  ];
+  if (file === 'exam-simulation.html') {
+    graph.push({
+      '@type': 'LearningResource',
+      name: 'محاكاة امتحان رخصة السياقة',
+      url: canonical,
+      inLanguage: 'ar-DZ',
+      educationalUse: 'assessment',
+      learningResourceType: 'practice assessment',
+      timeRequired: 'PT15M',
+      isAccessibleForFree: true,
+      isPartOf: { '@id': `${siteUrl}/#organization` }
+    });
+  }
+  const schema = JSON.stringify({ '@context': 'https://schema.org', '@graph': graph });
   return `<!doctype html>
 <html lang="ar" dir="rtl">
 <head>
@@ -86,10 +98,13 @@ function head({ title, description, file, type = 'website' }) {
   <meta property="og:url" content="${canonical}">
   <meta property="og:image" content="${siteUrl}/assets/social-cover.png">
   <meta property="og:image:alt" content="دليل السياقة DZ — تعلّم الإشارات وقواعد السير بأمان">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${title}">
   <meta name="twitter:description" content="${description}">
   <meta name="twitter:image" content="${siteUrl}/assets/social-cover.png">
+  <meta name="twitter:image:alt" content="دليل السياقة DZ — تعلّم الإشارات وقواعد السير بأمان">
   <title>${title}</title>
   <link rel="stylesheet" href="css/style.css">
   <script type="application/ld+json">${schema}</script>
@@ -108,7 +123,27 @@ ${footer()}
 }
 
 function hero({ eyebrow, title, text, actions = '', image = false }) {
-  return `<section class="page-hero"><div class="container ${image ? 'hero-grid' : ''}"><div class="hero-copy"><p class="eyebrow">${eyebrow}</p><h1>${title}</h1><p>${text}</p>${actions ? `<div class="hero-actions">${actions}</div>` : ''}</div>${image ? `<figure class="hero-media"><img src="assets/images/algerian-stop-sign.jpg" alt="إشارة توقف حقيقية في الجزائر" width="500" height="825"><figcaption class="hero-media__caption"><strong>تعلّم الإشارة، ثم اتخذ القرار.</strong><span>صورة واقعية لإشارة توقف جزائرية.</span></figcaption></figure>` : ''}</div></section>`;
+  const visualFor = () => {
+    if (image && typeof image === 'object') return image;
+    if (title.includes('دليلك العملي')) return { src: 'assets/images/algerian-stop-sign.jpg', alt: 'إشارة توقف حقيقية في الجزائر', caption: 'تعلّم الإشارة، ثم اتخذ القرار.', detail: 'صورة واقعية لإشارة توقف جزائرية.', kind: 'photo' };
+    if (title.includes('تصنيفات إشارات')) return { src: 'assets/signs/algeria-road-sign-e1.svg', alt: 'لوحة اتجاهات جزائرية', caption: 'اقرأ الإشارة قبل القرار.', detail: 'تصنيف واضح يبدأ بصورة واضحة.', kind: 'illustration' };
+    if (title.includes('إشارات التحذير') || title.includes('اختبار إشارات التحذير')) return { src: 'assets/signs/warning-a1a.svg', alt: 'إشارة تحذير من منعطف', caption: 'انتبه قبل الخطر.', detail: 'خفف السرعة واستعد للموقف.', kind: 'illustration' };
+    if (title.includes('إشارات المنع') || title.includes('اختبار إشارات المنع')) return { src: 'assets/signs/regulatory-c11a-50.svg', alt: 'إشارة حد سرعة', caption: 'احترم القيد دائماً.', detail: 'اللوحة التنظيمية جزء من قرارك الآمن.', kind: 'illustration' };
+    if (title.includes('إشارات الإلزام') || title.includes('اختبار إشارات الإلزام')) return { src: 'assets/signs/regulatory-d1a.svg', alt: 'إشارة اتجاه إلزامي', caption: 'اختر المسار مبكراً.', detail: 'اتبع الاتجاه المحدد بهدوء.', kind: 'illustration' };
+    if (title.includes('الإشارات الإرشادية') || title.includes('اختبار الإشارات الإرشادية')) return { src: 'assets/signs/algeria-road-sign-e1.svg', alt: 'إشارة اتجاهات إرشادية', caption: 'خطط قبل المفترق.', detail: 'المعلومة الواضحة تمنحك وقتاً كافياً.', kind: 'illustration' };
+    if (title.includes('قواعد السير')) return { src: 'assets/images/rules-driving-hero.webp', alt: 'سائق يقود مركبة على الطريق', caption: 'القواعد تحمي كل رحلة.', detail: 'صورة مرخصة لقيادة مركبة على الطريق.', kind: 'photo' };
+    if (title.includes('الاستعداد الجيد')) return { src: 'assets/images/safety-driving-hero.webp', alt: 'مركبة تسير على طريق محاط بالأشجار', caption: 'السلامة قرار متكرر.', detail: 'طريق واضح يبدأ باستعداد جيد.', kind: 'photo' };
+    if (title.includes('محاكاة امتحان')) return { src: 'assets/illustrations/rules-ready.svg', alt: 'رسم دلالي لجاهزية المركبة والاختبار', caption: 'استعد كما لو كنت في الامتحان.', detail: 'أسئلة شاملة، وقت محدد، ونتيجة مفصلة.', kind: 'illustration' };
+    if (title.includes('اختبر فهمك')) return { src: 'assets/illustrations/rules-focus.svg', alt: 'رسم دلالي للتركيز أثناء القيادة', caption: 'درّب قرارك قبل الطريق.', detail: 'اختبارات قصيرة، وفهم أعمق.', kind: 'illustration' };
+    if (title.includes('نساعد المتعلم')) return { src: 'assets/illustrations/safety-defensive.svg', alt: 'رسم دلالي للقيادة الدفاعية', caption: 'معرفة أوضح، طريق أكثر أماناً.', detail: 'تعليم عملي منظم.', kind: 'illustration' };
+    if (title.includes('ملاحظتك')) return { src: 'assets/illustrations/rules-focus.svg', alt: 'رسم دلالي للتواصل والتركيز', caption: 'كل ملاحظة تحسّن الدليل.', detail: 'نستمع إلى اقتراحاتك.', kind: 'illustration' };
+    if (title.includes('سياسة الخصوصية')) return { src: 'assets/illustrations/safety-defensive.svg', alt: 'رسم درع يرمز إلى الحماية', caption: 'خصوصيتك بوضوح.', detail: 'شفافية حول طريقة تشغيل الموقع.', kind: 'illustration' };
+    if (title.includes('إخلاء المسؤولية')) return { src: 'assets/signs/warning-a1a.svg', alt: 'إشارة تحذير مرورية', caption: 'المعرفة لا تغني عن اللوائح.', detail: 'اتبع تعليمات الجهات المختصة دائماً.', kind: 'illustration' };
+    if (title.includes('مصادر صور')) return { src: 'assets/images/algerian-stop-sign.jpg', alt: 'إشارة توقف واقعية في الجزائر', caption: 'المصدر جزء من الثقة.', detail: 'نسب واضح للأصول المستخدمة.', kind: 'photo' };
+    return { src: 'assets/illustrations/safety-defensive.svg', alt: 'رسم دلالي للقيادة الآمنة', caption: 'تعلّم بوضوح، قد بثقة.', detail: 'دليل السياقة DZ.', kind: 'illustration' };
+  };
+  const visual = visualFor();
+  return `<section class="page-hero"><div class="container hero-grid"><div class="hero-copy"><p class="eyebrow">${eyebrow}</p><h1>${title}</h1><p>${text}</p>${actions ? `<div class="hero-actions">${actions}</div>` : ''}</div><figure class="hero-media hero-media--${visual.kind}"><img src="${visual.src}" alt="${visual.alt}" width="1200" height="720" decoding="async" fetchpriority="high"><figcaption class="hero-media__caption"><strong>${visual.caption}</strong><span>${visual.detail}</span></figcaption></figure></div></section>`;
 }
 
 const categoryData = {
@@ -127,8 +162,12 @@ function signalCard(image, title, summary, details) {
   return `<article class="signal-card"><div class="signal-card__image"><img src="${image}" alt="${title}" loading="lazy"></div><span class="tag">إشارة تعليمية جزائرية</span><h2>${title}</h2><p>${summary}</p><ul class="key-points">${details.map((item) => `<li>${item}</li>`).join('')}</ul></article>`;
 }
 
+function visualCard(image, alt, label, title, text) {
+  return `<article class="visual-card"><div class="visual-card__image"><img src="${image}" alt="${alt}" width="160" height="110" loading="lazy" decoding="async"></div><div class="visual-card__body"><span class="tag">${label}</span><h2>${title}</h2><p>${text}</p></div></article>`;
+}
+
 const homeBody = `${hero({ eyebrow: 'تعلّم بوضوح، قد بثقة', title: 'دليلك العملي لفهم إشارات المرور في الجزائر.', text: 'اكتشف تصنيفات الإشارات، راجع قواعد الطريق، ثم اختبر معلوماتك في اختبارات قصيرة مخصصة لكل فئة.', actions: '<a class="button" href="signals.html">استكشف الإشارات</a><a class="button button--secondary" href="quiz.html">ابدأ اختباراً</a>', image: true })}
-<section class="stats-band"><div class="container stats-grid"><div class="stat"><strong>4</strong><span>تصنيفات رئيسة</span></div><div class="stat"><strong>11</strong><span>إشارة تعليمية</span></div><div class="stat"><strong>4</strong><span>اختبارات مستقلة</span></div><div class="stat"><strong>100%</strong><span>متجاوب مع الهاتف</span></div></div></section>
+<section class="stats-band" aria-label="إحصاءات المحتوى"><div class="container stats-grid"><div class="stat"><strong data-stat="categories">—</strong><span>تصنيفات رئيسة</span></div><div class="stat"><strong data-stat="signals">—</strong><span>إشارة تعليمية</span></div><div class="stat"><strong data-stat="tests">—</strong><span>اختبارات مستقلة</span></div><div class="stat"><strong data-stat="questions">—</strong><span>سؤالاً تدريبياً</span></div></div></section>
 <section class="section section--white"><div class="container"><div class="section-heading"><p class="eyebrow">ابدأ من الفئة</p><h2>تعلّم الإشارات كما تراها على الطريق</h2><p>لكل فئة صفحة مستقلة، وصور واضحة، ونقاط عملية تساعدك على ربط الإشارة بالتصرف الصحيح.</p></div><div class="category-grid">${['warning', 'prohibition', 'mandatory', 'information'].map(categoryCard).join('')}</div></div></section>
 <section class="section"><div class="container"><div class="card-grid card-grid--4"><article class="content-card"><div class="card-icon">1</div><h3>تعرّف</h3><p>ابدأ بشكل الإشارة ولونها وما الذي تنبهك إليه أو تلزمك به.</p></article><article class="content-card"><div class="card-icon">2</div><h3>افهم</h3><p>راجع السلوك الآمن المرتبط بكل علامة بدل حفظ شكلها فقط.</p></article><article class="content-card"><div class="card-icon">3</div><h3>اختبر</h3><p>أجب عن أسئلة قصيرة تظهر لك التفسير فوراً بعد الاختيار.</p></article><article class="content-card"><div class="card-icon">4</div><h3>راجع</h3><p>ارجع إلى الصفحة المناسبة عند الحاجة قبل موعد التدريب أو الامتحان.</p></article></div></div></section>`;
 
@@ -148,17 +187,39 @@ write('mandatory-signs.html', page({ title: 'إشارات الإلزام وال�
 const informationBody = `${hero({ eyebrow: 'درس الفئة الرابعة', title: 'الإشارات الإرشادية', text: 'تساعدك هذه اللوحات على فهم الوجهات والخدمات واختيار مسارك مبكراً من دون ارتباك أو تغيير مفاجئ للمسار.' })}<section class="section section--white"><div class="container signal-layout"><div class="signal-grid">${signalCard('assets/signs/algeria-road-sign-e1.svg', 'لوحة الاتجاهات', 'توضح وجهات ومسارات متعددة كي تختار الاتجاه الصحيح قبل الوصول إلى المفترق.', ['اقرأ اللوحة من مسافة كافية', 'اختر المسار مبكراً', 'لا تغيّر المسار فجأة'])}${signalCard('assets/signs/algeria-road-sign-e11.svg', 'إرشاد خاص', 'مثال من اللوحات الإرشادية المستخدمة على الطريق؛ اقرأ الرمز والكتابة المرافقة قبل اتخاذ القرار.', ['اربط اللوحة بموقعك', 'راقب الخدمات أو الوجهات', 'اتبع المسار بهدوء'])}</div><aside class="info-panel"><h2>قاعدة الإرشاد</h2><p>اللوحة الإرشادية تمنحك وقتاً للتخطيط. عندما تراها مبكراً، اختر المسار المناسب بهدوء بدلاً من مناورات اللحظة الأخيرة.</p><a class="button" href="quiz-information.html">اختبر الإشارات الإرشادية</a></aside></div></section>`;
 write('information-signs.html', page({ title: 'الإشارات الإرشادية والاتجاهات | دليل السياقة DZ', description: 'تعلّم قراءة لوحات الاتجاهات والخدمات واختيار المسار بهدوء قبل التقاطعات في الجزائر.', file: 'information-signs.html', active: 'signals', body: informationBody }));
 
-write('rules.html', page({ title: 'قواعد السياقة الآمنة | دليل السياقة DZ', description: 'مراجعة مبسطة لقواعد السياقة الآمنة: السرعة، مسافة الأمان، الحزام، التركيز، وتغيير المسار.', file: 'rules.html', active: 'rules', body: `${hero({ eyebrow: 'مراجعة يومية', title: 'قواعد السير التي تصنع فرقاً على الطريق', text: 'القواعد لا تُحفظ بمعزل عن الطريق؛ اربط كل قاعدة بموقف واقعي يحافظ على وقتك ومساحتك وهدوئك.' })}<section class="section section--white"><div class="container"><div class="card-grid card-grid--4"><article class="content-card"><div class="card-icon">↯</div><h3>السرعة المناسبة</h3><p>اتبع الحد المعلن وعدّل سرعتك حسب الرؤية والطقس والازدحام، لا حسب إحساسك فقط.</p></article><article class="content-card"><div class="card-icon">↔</div><h3>مسافة الأمان</h3><p>اترك أمامك وقتاً ومسافة كافيين للتوقف أو المناورة، وزدهما عندما يصبح الطريق زلقاً.</p></article><article class="content-card"><div class="card-icon">▣</div><h3>حزام الأمان</h3><p>تأكد من ربط الحزام ووضعية الجلوس والمرايا قبل تحريك المركبة.</p></article><article class="content-card"><div class="card-icon">◫</div><h3>التركيز</h3><p>ضع الهاتف بعيداً عن يدك واضبط وجهتك قبل الانطلاق حتى يبقى انتباهك للطريق.</p></article><article class="content-card"><div class="card-icon">⇆</div><h3>تغيير المسار</h3><p>شغّل المؤشر، افحص المرايا والنقطة العمياء، ثم انتقل بسلاسة عند توفر المساحة.</p></article><article class="content-card"><div class="card-icon">◉</div><h3>المشاة</h3><p>خفف السرعة قرب المعابر والمدارس والأسواق، وكن مستعداً دائماً للتوقف.</p></article><article class="content-card"><div class="card-icon">☼</div><h3>الرؤية ليلاً</h3><p>نظف الزجاج، استخدم الإضاءة المناسبة، ولا تحدق في أضواء المركبات المقابلة.</p></article><article class="content-card"><div class="card-icon">✦</div><h3>جاهزية المركبة</h3><p>افحص الإطارات والأضواء والسوائل بانتظام لأن السلامة تبدأ قبل تشغيل المحرك.</p></article></div></div></section>` }));
+const ruleCards = [
+  ['assets/illustrations/rules-speed.svg', 'رسم دلالي لمقياس السرعة', 'سلوك الطريق', 'السرعة المناسبة', 'اتبع الحد المعلن وعدّل سرعتك حسب الرؤية والطقس والازدحام، لا حسب إحساسك فقط.'],
+  ['assets/illustrations/rules-distance.svg', 'رسم دلالي لمسافة الأمان بين مركبتين', 'سلوك الطريق', 'مسافة الأمان', 'اترك أمامك وقتاً ومسافة كافيين للتوقف أو المناورة، وزدهما عندما يصبح الطريق زلقاً.'],
+  ['assets/illustrations/rules-seatbelt.svg', 'رسم دلالي لحزام الأمان', 'قبل التحرك', 'حزام الأمان', 'تأكد من ربط الحزام ووضعية الجلوس والمرايا قبل تحريك المركبة.'],
+  ['assets/illustrations/rules-focus.svg', 'رسم دلالي للتركيز أثناء القيادة', 'انتباه السائق', 'التركيز', 'ضع الهاتف بعيداً عن يدك واضبط وجهتك قبل الانطلاق حتى يبقى انتباهك للطريق.'],
+  ['assets/illustrations/rules-lane.svg', 'رسم دلالي لتغيير المسار', 'مناورة آمنة', 'تغيير المسار', 'شغّل المؤشر، افحص المرايا والنقطة العمياء، ثم انتقل بسلاسة عند توفر المساحة.'],
+  ['assets/illustrations/rules-pedestrian.svg', 'رسم دلالي لعبور المشاة', 'أولوية الطريق', 'المشاة', 'خفف السرعة قرب المعابر والمدارس والأسواق، وكن مستعداً دائماً للتوقف.'],
+  ['assets/illustrations/rules-night.svg', 'رسم دلالي للرؤية ليلاً', 'رؤية آمنة', 'الرؤية ليلاً', 'نظف الزجاج، استخدم الإضاءة المناسبة، ولا تحدق في أضواء المركبات المقابلة.'],
+  ['assets/illustrations/rules-ready.svg', 'رسم دلالي لجاهزية المركبة', 'فحص وقائي', 'جاهزية المركبة', 'افحص الإطارات والأضواء والسوائل بانتظام لأن السلامة تبدأ قبل تشغيل المحرك.']
+];
 
-write('safety.html', page({ title: 'نصائح السلامة على الطريق | دليل السياقة DZ', description: 'نصائح عملية للقيادة تحت المطر وليلاً وعلى الطرق السريعة، مع خطوات للاستعداد للحالات الطارئة.', file: 'safety.html', active: 'safety', body: `${hero({ eyebrow: 'قيادة أكثر أماناً', title: 'الاستعداد الجيد يمنحك قراراً أفضل.', text: 'تعرّف إلى العادات الصغيرة التي تقلل المخاطر قبل الرحلة وأثناء المطر والليل والطوارئ.' })}<section class="section section--white"><div class="container"><div class="card-grid"><article class="content-card"><div class="card-icon">✓</div><h3>قبل الانطلاق</h3><p>اضبط المقعد والمرايا، اربط الحزام، وتأكد من أن الهاتف لا يشتت انتباهك.</p></article><article class="content-card"><div class="card-icon">☂</div><h3>تحت المطر</h3><p>خفف السرعة، زد مسافة الأمان، وتجنب الكبح أو الانعطاف المفاجئ على الطريق الزلق.</p></article><article class="content-card"><div class="card-icon">☾</div><h3>في الليل</h3><p>اجعل الرؤية أولوية، واختَر سرعة تسمح لك بالتوقف ضمن المسافة التي تراها بوضوح.</p></article><article class="content-card"><div class="card-icon">⇢</div><h3>الطريق السريع</h3><p>خطط للمسار، لا تتوقف إلا عند الضرورة، ولا تغيّر المسار من دون مراقبة كاملة.</p></article><article class="content-card"><div class="card-icon">!</div><h3>التعب</h3><p>عند النعاس أو فقدان التركيز، توقف في مكان آمن وخذ استراحة قبل أن يستمر تأثيره.</p></article><article class="content-card"><div class="card-icon">◌</div><h3>القيادة الدفاعية</h3><p>توقع ما قد يفعله الآخرون واترك لنفسك دائماً وقتاً ومساحة للتصرف بأمان.</p></article></div></div></section><section class="section"><div class="container"><div class="notice"><p><strong>عند الطوارئ:</strong> حافظ على هدوئك، شغّل أضواء التحذير عند الحاجة، وتوقف في مكان آمن قدر الإمكان قبل طلب المساعدة من الجهة المختصة.</p></div></div></section>` }));
+const safetyCards = [
+  ['assets/illustrations/safety-before.svg', 'رسم دلالي للاستعداد قبل الانطلاق', 'قبل الرحلة', 'قبل الانطلاق', 'اضبط المقعد والمرايا، اربط الحزام، وتأكد من أن الهاتف لا يشتت انتباهك.'],
+  ['assets/illustrations/safety-rain.svg', 'رسم دلالي للقيادة تحت المطر', 'طقس متغير', 'تحت المطر', 'خفف السرعة، زد مسافة الأمان، وتجنب الكبح أو الانعطاف المفاجئ على الطريق الزلق.'],
+  ['assets/illustrations/safety-night.svg', 'رسم دلالي للقيادة ليلاً', 'رؤية منخفضة', 'في الليل', 'اجعل الرؤية أولوية، واختر سرعة تسمح لك بالتوقف ضمن المسافة التي تراها بوضوح.'],
+  ['assets/illustrations/safety-highway.svg', 'رسم دلالي للطريق السريع', 'مسار سريع', 'الطريق السريع', 'خطط للمسار، لا تتوقف إلا عند الضرورة، ولا تغيّر المسار من دون مراقبة كاملة.'],
+  ['assets/illustrations/safety-fatigue.svg', 'رسم دلالي للتعب أثناء القيادة', 'استراحة ضرورية', 'التعب', 'عند النعاس أو فقدان التركيز، توقف في مكان آمن وخذ استراحة قبل أن يستمر تأثيره.'],
+  ['assets/illustrations/safety-defensive.svg', 'رسم دلالي للقيادة الدفاعية', 'توقع المخاطر', 'القيادة الدفاعية', 'توقع ما قد يفعله الآخرون واترك لنفسك دائماً وقتاً ومساحة للتصرف بأمان.']
+];
+
+write('rules.html', page({ title: 'قواعد السياقة الآمنة | دليل السياقة DZ', description: 'مراجعة مبسطة لقواعد السياقة الآمنة: السرعة، مسافة الأمان، الحزام، التركيز، وتغيير المسار.', file: 'rules.html', active: 'rules', body: `${hero({ eyebrow: 'مراجعة يومية', title: 'قواعد السير التي تصنع فرقاً على الطريق', text: 'القواعد لا تُحفظ بمعزل عن الطريق؛ اربط كل قاعدة بموقف واقعي يحافظ على وقتك ومساحتك وهدوئك.' })}<section class="section section--white"><div class="container"><div class="section-heading"><p class="eyebrow">سلوك يحميك</p><h2>قاعدة واضحة لكل موقف</h2><p>تربط البطاقات بين قاعدة الطريق وصورتها الدلالية حتى تتذكر التصرف الصحيح بصورة أسرع.</p></div><div class="visual-card-grid">${ruleCards.map(([image, alt, label, title, text]) => visualCard(image, alt, label, title, text)).join('')}</div></div></section>` }));
+
+write('safety.html', page({ title: 'نصائح السلامة على الطريق | دليل السياقة DZ', description: 'نصائح عملية للقيادة تحت المطر وليلاً وعلى الطرق السريعة، مع خطوات للاستعداد للحالات الطارئة.', file: 'safety.html', active: 'safety', body: `${hero({ eyebrow: 'قيادة أكثر أماناً', title: 'الاستعداد الجيد يمنحك قراراً أفضل.', text: 'تعرّف إلى العادات الصغيرة التي تقلل المخاطر قبل الرحلة وأثناء المطر والليل والطوارئ.' })}<section class="section section--white"><div class="container"><div class="section-heading"><p class="eyebrow">قرارك الآمن</p><h2>صور تذكّرك بالسلوك الصحيح</h2><p>راجع الموقف، ثم طبّق الخطوة المناسبة بهدوء قبل أن يتحول الخطر إلى طارئ.</p></div><div class="visual-card-grid visual-card-grid--three">${safetyCards.map(([image, alt, label, title, text]) => visualCard(image, alt, label, title, text)).join('')}</div></div></section><section class="section"><div class="container"><div class="notice"><p><strong>عند الطوارئ:</strong> حافظ على هدوئك، شغّل أضواء التحذير عند الحاجة، وتوقف في مكان آمن قدر الإمكان قبل طلب المساعدة من الجهة المختصة.</p></div></div></section>` }));
 
 const quizCards = [['warning','إشارات التحذير','اختبار من 3 أسئلة عن المنعطفات والمنحدرات ومواقف الخطر.'],['prohibition','إشارات المنع','اختبار من 3 أسئلة عن التوقف والسرعة والمنع.'],['mandatory','إشارات الإلزام','اختبار من 3 أسئلة عن الاتجاهات والمسارات المفروضة.'],['information','الإشارات الإرشادية','اختبار من 3 أسئلة عن الاتجاهات والخدمات واختيار المسار.']];
-write('quiz.html', page({ title: 'اختبارات إشارات المرور حسب الفئة | دليل السياقة DZ', description: 'اختبارات قصيرة منفصلة لإشارات التحذير والمنع والإلزام والإرشاد، مع إجابة صحيحة وشرح مباشر.', file: 'quiz.html', active: 'quiz', body: `${hero({ eyebrow: 'تدريب ذاتي', title: 'اختبر فهمك لكل فئة على حدة.', text: 'اختر اختباراً قصيراً. ستظهر الإجابة الصحيحة والتفسير مباشرة بعد كل اختيار.' })}<section class="section section--white"><div class="container"><div class="quiz-list">${quizCards.map(([key,title,text], i) => `<a class="quiz-row" href="quiz-${key}.html"><span class="quiz-row__icon">${i + 1}</span><span><h2>${title}</h2><p>${text}</p></span><span class="quiz-row__arrow">←</span></a>`).join('')}</div></div></section>` }));
+write('quiz.html', page({ title: 'اختبارات إشارات المرور حسب الفئة | دليل السياقة DZ', description: 'اختبارات قصيرة منفصلة لإشارات التحذير والمنع والإلزام والإرشاد، مع محاكاة امتحان شاملة وتصحيح مباشر.', file: 'quiz.html', active: 'quiz', body: `${hero({ eyebrow: 'تدريب ذاتي', title: 'اختبر فهمك لكل فئة على حدة.', text: 'اختر اختباراً قصيراً للتدريب، أو ابدأ محاكاة شاملة تجمع الأسئلة في اختبار بزمن ونتيجة مفصلة.' })}<section class="section section--white"><div class="container"><div class="quiz-list"><a class="quiz-row quiz-row--featured" href="exam-simulation.html"><span class="quiz-row__icon">★</span><span><h2>محاكاة امتحان رخصة السياقة</h2><p>اختبار شامل من 12 سؤالاً متنوعاً، مع مؤقت، ومراجعة كاملة للنتيجة في النهاية.</p></span><span class="quiz-row__arrow">ابدأ ←</span></a>${quizCards.map(([key,title,text], i) => `<a class="quiz-row" href="quiz-${key}.html"><span class="quiz-row__icon">${i + 1}</span><span><h2>${title}</h2><p>${text}</p></span><span class="quiz-row__arrow">←</span></a>`).join('')}</div></div></section>` }));
 
 for (const [key, title] of quizCards) {
   write(`quiz-${key}.html`, page({ title: `${quizzesTitle(key)} | دليل السياقة DZ`, description: `اختبار تفاعلي قصير في ${quizzesTitle(key)} مع تصحيح فوري وتفسير لكل إجابة.`, file: `quiz-${key}.html`, active: 'quiz', body: `${hero({ eyebrow: 'اختبار فئة', title: quizzesTitle(key), text: 'أجب عن الأسئلة الثلاثة، ثم راجع التفسير الذي يظهر مباشرة بعد كل اختيار.' })}<section class="section section--white"><div class="container quiz-shell"><div data-quiz="${key}"></div></div></section>` }));
 }
 function quizzesTitle(key) { return ({ warning:'اختبار إشارات التحذير', prohibition:'اختبار إشارات المنع', mandatory:'اختبار إشارات الإلزام', information:'اختبار الإشارات الإرشادية' })[key]; }
+
+write('exam-simulation.html', page({ title: 'محاكاة امتحان رخصة السياقة | دليل السياقة DZ', description: 'محاكاة تفاعلية شاملة لامتحان رخصة السياقة: 12 سؤالاً متنوعاً، مؤقت، متابعة للتقدم، ونتيجة مع مراجعة الإجابات.', file: 'exam-simulation.html', active: 'quiz', body: `${hero({ eyebrow: 'اختبار شامل', title: 'محاكاة امتحان رخصة السياقة', text: 'اختبر معلوماتك في جلسة تحاكي نمط الامتحان: أسئلة متنوعة، وقت محدد، وانتقال منظم بين الإجابات.' })}<section class="section section--white"><div class="container exam-shell"><div data-exam-simulation></div></div></section>` }));
 
 write('about.html', page({ title: 'من نحن | دليل السياقة DZ', description: 'تعرف إلى هدف دليل السياقة DZ وطريقته التعليمية ومحدودية المحتوى المنشور على المنصة.', file: 'about.html', active: 'about', body: `${hero({ eyebrow: 'عن المنصة', title: 'نساعد المتعلم على قراءة الطريق بوضوح.', text: 'دليل السياقة DZ مساحة تعليمية عربية مبسطة تجمع الإشارات الأساسية وقواعد السلوك الآمن والاختبارات القصيرة.' })}<section class="section section--white"><div class="container prose"><h2>هدفنا</h2><p>هدف الدليل هو تبسيط المراجعة الأولية لإشارات المرور ومبادئ القيادة الآمنة. يقدم الموقع معلومات منظمة حسب الفئات لكي يجد المتعلم الدرس والاختبار المناسبين بسرعة.</p><h2>كيف نعمل</h2><p>نقسم المحتوى إلى فئات مرئية، ثم نعرض صورة الإشارة ومعناها وسلوكاً عملياً مقترحاً. بعد ذلك يستطيع الزائر اختبار نفسه في أسئلة قصيرة مع تصحيح فوري.</p><h2>مصادر الصور</h2><p>تظهر الصور الواقعية والرسومات المستخدمة لأغراض تعليمية فقط. يخصص الموقع صفحة لنسب الأصول ومصادرها المتاحة.</p><p><a class="button" href="ATTRIBUTION.md">عرض مصادر الصور</a></p></div></section>` }));
 

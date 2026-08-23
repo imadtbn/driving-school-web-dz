@@ -33,6 +33,39 @@ const quizzes = {
   }
 };
 
+const contentCatalog = {
+  signals: 11,
+  tests: () => Object.keys(quizzes).length + 1,
+  questions: () => Object.values(quizzes).reduce((total, quiz) => total + quiz.questions.length, 0)
+};
+
+function renderDynamicStats() {
+  const metrics = {
+    categories: Object.keys(quizzes).length,
+    signals: contentCatalog.signals,
+    tests: contentCatalog.tests(),
+    questions: contentCatalog.questions()
+  };
+  const formatter = new Intl.NumberFormat('ar-DZ');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.querySelectorAll('[data-stat]').forEach((element) => {
+    const target = metrics[element.dataset.stat];
+    if (typeof target !== 'number') return;
+    if (reduceMotion) {
+      element.textContent = formatter.format(target);
+      return;
+    }
+    const duration = 560;
+    const start = performance.now();
+    const tick = (now) => {
+      const progress = Math.min((now - start) / duration, 1);
+      element.textContent = formatter.format(Math.round(target * (1 - Math.pow(1 - progress, 3))));
+      if (progress < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  });
+}
+
 function renderQuiz(type) {
   const config = quizzes[type];
   const target = document.querySelector('[data-quiz]');
@@ -73,6 +106,59 @@ function renderQuiz(type) {
   render();
 }
 
+function renderExamSimulation() {
+  const target = document.querySelector('[data-exam-simulation]');
+  if (!target) return;
+  const questions = Object.entries(quizzes).flatMap(([category, quiz]) => quiz.questions.map((question) => ({ ...question, category })));
+  const categoryLabels = { warning: 'التحذير', prohibition: 'المنع', mandatory: 'الإلزام', information: 'الإرشاد' };
+  const answers = Array(questions.length).fill(null);
+  const formatter = new Intl.NumberFormat('ar-DZ');
+  let current = 0;
+  let timeLeft = 15 * 60;
+  let timer = null;
+
+  const formatTime = (seconds) => `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
+  const stopTimer = () => { if (timer) window.clearInterval(timer); timer = null; };
+  const tick = () => {
+    timeLeft -= 1;
+    const clock = target.querySelector('[data-exam-timer]');
+    if (clock) clock.textContent = formatTime(Math.max(timeLeft, 0));
+    if (timeLeft <= 0) finish(true);
+  };
+  const startTimer = () => { stopTimer(); timer = window.setInterval(tick, 1000); };
+
+  const renderIntro = () => {
+    target.innerHTML = `<section class="exam-intro"><div class="exam-intro__badge">محاكاة تفاعلية</div><h1>جاهز لجلسة اختبار شاملة؟</h1><p>تضم المحاكاة ${formatter.format(questions.length)} سؤالاً من فئات الإشارات الأربع. لديك 15 دقيقة، ويمكنك العودة إلى أي سؤال قبل إنهاء الجلسة.</p><div class="exam-rules"><span>◷ 15 دقيقة</span><span>◉ ${formatter.format(questions.length)} سؤالاً</span><span>✓ النتيجة والمراجعة في النهاية</span></div><button class="button" type="button" data-start-simulation>ابدأ المحاكاة</button></section>`;
+    target.querySelector('[data-start-simulation]').addEventListener('click', () => { renderQuestion(); startTimer(); });
+  };
+
+  const renderQuestion = () => {
+    const question = questions[current];
+    const answered = answers.filter((answer) => answer !== null).length;
+    const progress = Math.round((answered / questions.length) * 100);
+    target.innerHTML = `<section class="exam-card"><div class="exam-card__top"><div><span class="tag">محاكاة الامتحان</span><strong>السؤال ${formatter.format(current + 1)} من ${formatter.format(questions.length)}</strong></div><div class="exam-timer" aria-live="polite">◷ <span data-exam-timer>${formatTime(timeLeft)}</span></div></div><div class="progress" aria-label="نسبة الإجابات"><span style="width:${progress}%"></span></div><div class="exam-layout"><aside class="exam-sidebar"><p>الأسئلة</p><div class="exam-question-map">${questions.map((_, index) => `<button class="exam-map-button ${index === current ? 'is-current' : ''} ${answers[index] !== null ? 'is-answered' : ''}" type="button" data-go-question="${index}" aria-label="الانتقال إلى السؤال ${index + 1}">${index + 1}</button>`).join('')}</div><small>تمت الإجابة عن ${formatter.format(answered)} من ${formatter.format(questions.length)}</small></aside><div class="exam-main"><p class="eyebrow">فئة ${categoryLabels[question.category]}</p><h1 class="quiz-question">${question.q}</h1><div class="quiz-options">${question.o.map((option, answerIndex) => `<button class="quiz-option ${answers[current] === answerIndex ? 'is-selected' : ''}" type="button" data-exam-answer="${answerIndex}" aria-pressed="${answers[current] === answerIndex}"><span class="option-letter" aria-hidden="true">${String.fromCharCode(65 + answerIndex)}</span><span>${option}</span></button>`).join('')}</div><div class="exam-actions"><button class="button button--quiet" type="button" data-exam-previous ${current === 0 ? 'disabled' : ''}>السابق</button>${current === questions.length - 1 ? '<button class="button" type="button" data-exam-finish>إنهاء وعرض النتيجة</button>' : '<button class="button" type="button" data-exam-next>التالي</button>'}</div></div></div></section>`;
+    target.querySelectorAll('[data-exam-answer]').forEach((button) => button.addEventListener('click', () => { answers[current] = Number(button.dataset.examAnswer); renderQuestion(); }));
+    target.querySelectorAll('[data-go-question]').forEach((button) => button.addEventListener('click', () => { current = Number(button.dataset.goQuestion); renderQuestion(); }));
+    const previous = target.querySelector('[data-exam-previous]');
+    if (previous) previous.addEventListener('click', () => { current -= 1; renderQuestion(); });
+    const next = target.querySelector('[data-exam-next]');
+    if (next) next.addEventListener('click', () => { current += 1; renderQuestion(); });
+    const finishButton = target.querySelector('[data-exam-finish]');
+    if (finishButton) finishButton.addEventListener('click', () => finish(false));
+  };
+
+  const finish = (timedOut) => {
+    stopTimer();
+    const score = questions.reduce((total, question, index) => total + (answers[index] === question.a ? 1 : 0), 0);
+    const percentage = Math.round((score / questions.length) * 100);
+    const passed = percentage >= 70;
+    target.innerHTML = `<section class="exam-result"><div class="quiz-result__score">${formatter.format(percentage)}%</div><p class="eyebrow">${timedOut ? 'انتهى الوقت' : 'اكتملت المحاكاة'}</p><h1>${passed ? 'أحسنت، تجاوزت المستوى التدريبي.' : 'نتيجة تدريبية تحتاج إلى مراجعة.'}</h1><p>أجبت إجابة صحيحة عن ${formatter.format(score)} من ${formatter.format(questions.length)} سؤالاً. النتيجة مرجعية للتدريب ولا تمثل نتيجة امتحان رسمي.</p><div class="exam-review">${questions.map((question, index) => `<article class="exam-review__item ${answers[index] === question.a ? 'is-correct' : 'is-incorrect'}"><span>${index + 1}</span><div><strong>${answers[index] === question.a ? 'إجابة صحيحة' : 'راجع هذه الإجابة'}</strong><p>${question.q}</p><small>الإجابة الصحيحة: ${question.o[question.a]}</small></div></article>`).join('')}</div><button class="button" type="button" data-exam-restart>أعد المحاكاة</button></section>`;
+    target.querySelector('[data-exam-restart]').addEventListener('click', () => { answers.fill(null); current = 0; timeLeft = 15 * 60; renderIntro(); });
+  };
+
+  renderIntro();
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const toggle = document.querySelector('.menu-toggle');
   const nav = document.querySelector('.primary-nav');
@@ -94,6 +180,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  renderDynamicStats();
+
   const quiz = document.querySelector('[data-quiz]');
   if (quiz) renderQuiz(quiz.dataset.quiz);
+
+  renderExamSimulation();
 });
