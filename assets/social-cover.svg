@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">دليل السياقة DZ</title>
+  <desc id="desc">تعلم إشارات المرور وقواعد السير بأمان</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#063d29"/><stop offset="1" stop-color="#087346"/></linearGradient>
+    <linearGradient id="road" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#294a3b"/><stop offset="1" stop-color="#172d23"/></linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <circle cx="1020" cy="80" r="250" fill="#fff" opacity=".05"/>
+  <circle cx="1040" cy="100" r="165" fill="none" stroke="#fff" stroke-width="18" opacity=".07"/>
+  <path d="M150 630 390 255h420l240 375Z" fill="url(#road)"/>
+  <path d="M600 291v310" stroke="#eab141" stroke-width="18" stroke-dasharray="44 30"/>
+  <path d="M260 555 390 305M940 555 810 305" stroke="#f7faf8" stroke-width="10" opacity=".8"/>
+  <g transform="translate(104 98)">
+    <rect width="66" height="66" rx="18" fill="#fff"/>
+    <path d="M33 11 58 54H8Z" fill="#fff" stroke="#df9b20" stroke-width="6" stroke-linejoin="round"/>
+    <path d="M33 25v15M33 47v1" stroke="#063d29" stroke-width="6" stroke-linecap="round"/>
+  </g>
+  <text x="103" y="230" fill="#eab141" font-family="Arial, sans-serif" font-size="27" font-weight="700">تعلّم بوضوح، قد بثقة</text>
+  <text x="103" y="310" fill="#fff" font-family="Arial, sans-serif" font-size="68" font-weight="700">دليل السياقة DZ</text>
+  <text x="103" y="365" fill="#d6eadd" font-family="Arial, sans-serif" font-size="31">إشارات المرور · قواعد السير · اختبارات تفاعلية</text>
+  <rect x="103" y="415" width="345" height="54" rx="27" fill="#fff" opacity=".12"/>
+  <text x="132" y="451" fill="#fff" font-family="Arial, sans-serif" font-size="23">الدليل التعليمي للسياقة الآمنة</text>
+</svg>

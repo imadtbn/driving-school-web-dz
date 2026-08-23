@@ -1,0 +1,18 @@
+{
+  "name": "دليل السياقة DZ",
+  "short_name": "السياقة DZ",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "/driving-school-web-dz/",
+  "display": "standalone",
+  "background_color": "#f6faf7",
+  "theme_color": "#063d29",
+  "icons": [
+    {
+      "src": "assets/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
