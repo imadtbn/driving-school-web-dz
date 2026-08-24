@@ -4,6 +4,40 @@ const path = require('path');
 const root = __dirname;
 const siteUrl = 'https://imadtbn.github.io/driving-school-web-dz';
 const year = new Date().getFullYear();
+const officialRoadLawUrl = 'https://www.joradp.dz/FTP/jo-arabe/2026/A2026036.pdf';
+const apsRoadLawUrl = 'https://www.aps.dz/fr/algerie/actualite-nationale/mpekq33o-publication-de-la-loi-portant-code-de-la-route';
+const adSlots = {
+  'feed-01': { format: 'fluid', layoutKey: '-fr+56+4k-d4+74', slot: '7867079394' },
+  'display-01': { format: 'auto', slot: '3143411927', responsive: true },
+  'feed-02': { format: 'fluid', layoutKey: '-h9-h+8-jr+r8', slot: '8546947691' },
+  'display-02': { format: 'auto', slot: '1760836049', responsive: true },
+  'related-01': { format: 'autorelaxed', slot: '6528123169' }
+};
+
+function adUnit(name) {
+  const slot = adSlots[name];
+  const layout = slot.layoutKey ? ` data-ad-layout-key="${slot.layoutKey}"` : '';
+  const responsive = slot.responsive ? ' data-full-width-responsive="true"' : '';
+  return `<div class="ad-container ad-container--${name}" aria-label="إعلان"><p class="ad-label">إعلان</p><ins class="adsbygoogle" style="display:block" data-ad-format="${slot.format}"${layout} data-ad-client="ca-pub-5656416032906373" data-ad-slot="${slot.slot}"${responsive}></ins><script>(adsbygoogle = window.adsbygoogle || []).push({});</script></div>`;
+}
+
+function pageAdSlot(file) {
+  if (['index.html', 'signals.html', 'faq-road-law.html'].includes(file)) return 'feed-01';
+  if (['rules.html', 'safety.html', 'warning-signs.html', 'prohibition-signs.html', 'mandatory-signs.html', 'information-signs.html'].includes(file)) return 'display-01';
+  if (['quiz.html', 'quiz-warning.html', 'quiz-prohibition.html', 'quiz-mandatory.html', 'quiz-information.html', 'exam-simulation.html'].includes(file)) return 'display-02';
+  if (['about.html', 'contact.html', 'sources.html'].includes(file)) return 'related-01';
+  return 'feed-02';
+}
+
+const faqItems = [
+  { question: 'ما هو قانون المرور الجديد في الجزائر؟', answer: 'هو القانون رقم 26-09 المؤرخ في 12 مايو 2026 والمتضمن قانون المرور، والمنشور في الجريدة الرسمية للجمهورية الجزائرية، العدد 36 لسنة 2026.', source: officialRoadLawUrl },
+  { question: 'ما الذي ينظمه قانون المرور الجديد؟', answer: 'يحدد القانون قواعد تنظيم حركة المرور عبر الطرق وسلامتها وأمنها. ويشمل ضبط الحركة، وشروط استعمال المسالك العمومية، والإجراءات الوقائية، والإطار المؤسسي للأمن المروري، والتدابير المطبقة عند خرق قواعد المرور.', source: officialRoadLawUrl },
+  { question: 'ما الفرق بين التوقف والوقوف في تعريفات القانون؟', answer: 'يعرّف القانون التوقف بأنه مكث مؤقت للمركبة مع بقاء محركها مشغلاً وسائقها متمكناً من قيادتها فوراً، بينما الوقوف هو مكث المركبة خارج ظروف التوقف ويكون محركها متوقفاً. يبقى احترام العلامات والتنظيم المحلي شرطاً في الحالتين.', source: officialRoadLawUrl },
+  { question: 'هل ينظم القانون استعمال المسالك والطرق العمومية؟', answer: 'نعم. من نطاق القانون تنظيم شروط استعمال المسالك العمومية وقواعد ضبط حركة المرور، إلى جانب إجراءات وقائية تهدف إلى السلامة وتقليل حوادث المرور.', source: apsRoadLawUrl },
+  { question: 'هل يتضمن القانون قواعد تخص الطرق السريعة والسيارة؟', answer: 'يتضمن القانون تعريفات للطريق السريع والطريق السيار، ويتناول شروط الاستعمال ضمن أحكامه. ينبغي دائماً اتباع العلامات القائمة على الطريق والقيود المعلنة، والرجوع إلى النص الرسمي أو الجهات المختصة عند الحاجة إلى تفصيل تطبيقي.', source: officialRoadLawUrl },
+  { question: 'هل ينص القانون على تدابير عند خرق قواعد المرور؟', answer: 'نعم. يذكر نطاق القانون وجود تدابير ردعية تطبق عند خرق قواعد حركة المرور. لا يعرض هذا القسم مبالغ أو توصيفات فردية للجزاءات؛ راجع النص الرسمي والجهة المختصة للحالة المعنية.', source: apsRoadLawUrl },
+  { question: 'هل تكفي هذه الصفحة لمعرفة وضعي القانوني أو قيمة مخالفة؟', answer: 'لا. هذه الصفحة تبسيط تعليمي للمفاهيم العامة، وليست استشارة قانونية أو مرجعاً لتقدير مخالفة. استخدم الجريدة الرسمية، واللوحات الفعلية على الطريق، وتوجيهات الجهة المختصة عند أي حالة عملية.', source: officialRoadLawUrl }
+];
 
 function write(file, content) {
   fs.writeFileSync(path.join(root, file), content.trimStart(), 'utf8');
@@ -16,6 +50,7 @@ function header(active = '') {
     ['rules.html', 'قواعد السير', 'rules'],
     ['safety.html', 'السلامة', 'safety'],
     ['quiz.html', 'الاختبارات', 'quiz'],
+    ['faq-road-law.html', 'الأسئلة الشائعة', 'faq'],
     ['about.html', 'عن الدليل', 'about']
   ].map(([href, label, key]) => `<li><a href="${href}"${key === active ? ' class="is-active" aria-current="page"' : ''}>${label}</a></li>`).join('');
   return `<a class="skip-link" href="#main-content">انتقل إلى المحتوى</a>
@@ -33,7 +68,7 @@ function footer() {
   return `<footer class="site-footer">
   <div class="container footer-grid">
     <section><p class="footer-brand">دليل السياقة <span>DZ</span></p><p>منصة عربية تعليمية لفهم إشارات المرور ومبادئ القيادة الآمنة في الجزائر.</p><p>المحتوى للتوعية والتدريب ولا يغني عن اللوائح والتنبيهات الصادرة من الجهات المختصة.</p></section>
-    <section><h2>تعلّم</h2><ul><li><a href="signals.html">تصنيفات الإشارات</a></li><li><a href="rules.html">قواعد السير</a></li><li><a href="safety.html">نصائح السلامة</a></li><li><a href="quiz.html">اختبارات الفئات</a></li><li><a href="exam-simulation.html">محاكاة الامتحان</a></li></ul></section>
+    <section><h2>تعلّم</h2><ul><li><a href="signals.html">تصنيفات الإشارات</a></li><li><a href="rules.html">قواعد السير</a></li><li><a href="safety.html">نصائح السلامة</a></li><li><a href="quiz.html">اختبارات الفئات</a></li><li><a href="exam-simulation.html">محاكاة الامتحان</a></li><li><a href="faq-road-law.html">أسئلة قانون المرور</a></li></ul></section>
     <section><h2>الموقع</h2><ul><li><a href="about.html">من نحن</a></li><li><a href="contact.html">اتصل بنا</a></li><li><a href="privacy.html">سياسة الخصوصية</a></li><li><a href="disclaimer.html">إخلاء المسؤولية</a></li><li><a href="sources.html">مصادر الصور</a></li></ul></section>
   </div>
   <div class="container footer-bottom"><p>© ${year} دليل السياقة DZ. طريق أكثر أماناً يبدأ بمعرفة أوضح.</p></div>
@@ -63,6 +98,16 @@ function head({ title, description, file, type = 'website' }) {
         primaryImageOfPage: `${siteUrl}/assets/social-cover.png`
       }
   ];
+  if (file === 'faq-road-law.html') {
+    graph.push({
+      '@type': 'FAQPage',
+      mainEntity: faqItems.map((item) => ({
+        '@type': 'Question',
+        name: item.question,
+        acceptedAnswer: { '@type': 'Answer', text: item.answer }
+      }))
+    });
+  }
   if (file === 'exam-simulation.html') {
     graph.push({
       '@type': 'LearningResource',
@@ -107,6 +152,8 @@ function head({ title, description, file, type = 'website' }) {
   <meta name="twitter:image:alt" content="دليل السياقة DZ — تعلّم الإشارات وقواعد السير بأمان">
   <title>${title}</title>
   <link rel="stylesheet" href="css/style.css">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5656416032906373" crossorigin="anonymous"></script>
+  <meta name="google-adsense-account" content="ca-pub-5656416032906373">
   <script type="application/ld+json">${schema}</script>
 </head>`;
 }
@@ -116,6 +163,7 @@ function page({ title, description, file, active, body, type }) {
 <body>
 ${header(active)}
 <main id="main-content" tabindex="-1">${body}</main>
+${adUnit(pageAdSlot(file))}
 ${footer()}
 <script src="js/site.js"></script>
 </body>
@@ -133,6 +181,7 @@ function hero({ eyebrow, title, text, actions = '', image = false }) {
     if (title.includes('الإشارات الإرشادية') || title.includes('اختبار الإشارات الإرشادية')) return { src: 'assets/signs/algeria-road-sign-e1.svg', alt: 'إشارة اتجاهات إرشادية', caption: 'خطط قبل المفترق.', detail: 'المعلومة الواضحة تمنحك وقتاً كافياً.', kind: 'illustration' };
     if (title.includes('قواعد السير')) return { src: 'assets/images/rules-driving-hero.webp', alt: 'سائق يقود مركبة على الطريق', caption: 'القواعد تحمي كل رحلة.', detail: 'صورة مرخصة لقيادة مركبة على الطريق.', kind: 'photo' };
     if (title.includes('الاستعداد الجيد')) return { src: 'assets/images/safety-driving-hero.webp', alt: 'مركبة تسير على طريق محاط بالأشجار', caption: 'السلامة قرار متكرر.', detail: 'طريق واضح يبدأ باستعداد جيد.', kind: 'photo' };
+    if (title.includes('أسئلة شائعة')) return { src: 'assets/illustrations/rules-focus.svg', alt: 'رسم دلالي يرمز إلى فهم قواعد الطريق', caption: 'المعلومة الدقيقة تبدأ من المصدر.', detail: 'مراجعة مبسطة مع إحالات رسمية.', kind: 'illustration' };
     if (title.includes('محاكاة امتحان')) return { src: 'assets/illustrations/rules-ready.svg', alt: 'رسم دلالي لجاهزية المركبة والاختبار', caption: 'استعد كما لو كنت في الامتحان.', detail: 'أسئلة شاملة، وقت محدد، ونتيجة مفصلة.', kind: 'illustration' };
     if (title.includes('اختبر فهمك')) return { src: 'assets/illustrations/rules-focus.svg', alt: 'رسم دلالي للتركيز أثناء القيادة', caption: 'درّب قرارك قبل الطريق.', detail: 'اختبارات قصيرة، وفهم أعمق.', kind: 'illustration' };
     if (title.includes('نساعد المتعلم')) return { src: 'assets/illustrations/safety-defensive.svg', alt: 'رسم دلالي للقيادة الدفاعية', caption: 'معرفة أوضح، طريق أكثر أماناً.', detail: 'تعليم عملي منظم.', kind: 'illustration' };
@@ -221,11 +270,14 @@ function quizzesTitle(key) { return ({ warning:'اختبار إشارات الت
 
 write('exam-simulation.html', page({ title: 'محاكاة امتحان رخصة السياقة | دليل السياقة DZ', description: 'محاكاة تفاعلية شاملة لامتحان رخصة السياقة: 12 سؤالاً متنوعاً، مؤقت، متابعة للتقدم، ونتيجة مع مراجعة الإجابات.', file: 'exam-simulation.html', active: 'quiz', body: `${hero({ eyebrow: 'اختبار شامل', title: 'محاكاة امتحان رخصة السياقة', text: 'اختبر معلوماتك في جلسة تحاكي نمط الامتحان: أسئلة متنوعة، وقت محدد، وانتقال منظم بين الإجابات.' })}<section class="section section--white"><div class="container exam-shell"><div data-exam-simulation></div></div></section>` }));
 
+const faqBody = `${hero({ eyebrow: 'مرجع مبسط ومحدّث', title: 'أسئلة شائعة حول قانون المرور الجديد', text: 'إجابات موجزة مبنية على الجريدة الرسمية ووكالة الأنباء الجزائرية، تساعدك على فهم نطاق القانون ومفاهيمه العامة من دون أن تحل محل المصدر الرسمي.' })}<section class="section section--white"><div class="container faq-layout"><aside class="faq-aside"><p class="eyebrow">قبل أن تبدأ</p><h2>اقرأ القاعدة من مصدرها</h2><p>يركز هذا القسم على الشرح التعليمي العام. عند وجود حالة عملية أو غرامة أو إجراء، ارجع إلى النص الرسمي والجهة المختصة.</p><a class="button button--quiet" href="${officialRoadLawUrl}" target="_blank" rel="noopener noreferrer">فتح الجريدة الرسمية</a></aside><div class="faq-list">${faqItems.map((item, index) => `<details class="faq-item"${index === 0 ? ' open' : ''}><summary>${item.question}<span aria-hidden="true">+</span></summary><div class="faq-answer"><p>${item.answer}</p><a href="${item.source}" target="_blank" rel="noopener noreferrer">عرض المصدر الرسمي ←</a></div></details>`).join('')}</div></div></section><section class="section"><div class="container"><div class="notice"><p><strong>تنبيه:</strong> يتم تحديث هذا القسم عند توفر نصوص رسمية أو تنظيمية جديدة. لا تعتمد على ملخصات غير رسمية أو منشورات شبكات التواصل لتحديد التزاماتك أو وضعك القانوني.</p></div></div></section>`;
+write('faq-road-law.html', page({ title: 'أسئلة شائعة حول قانون المرور الجديد في الجزائر | دليل السياقة DZ', description: 'إجابات مبسطة وموثقة حول قانون المرور الجزائري رقم 26-09 لسنة 2026: نطاق القانون، التوقف والوقوف، الطرق العمومية والتدابير عند المخالفة.', file: 'faq-road-law.html', active: 'faq', body: faqBody }));
+
 write('about.html', page({ title: 'من نحن | دليل السياقة DZ', description: 'تعرف إلى هدف دليل السياقة DZ وطريقته التعليمية ومحدودية المحتوى المنشور على المنصة.', file: 'about.html', active: 'about', body: `${hero({ eyebrow: 'عن المنصة', title: 'نساعد المتعلم على قراءة الطريق بوضوح.', text: 'دليل السياقة DZ مساحة تعليمية عربية مبسطة تجمع الإشارات الأساسية وقواعد السلوك الآمن والاختبارات القصيرة.' })}<section class="section section--white"><div class="container prose"><h2>هدفنا</h2><p>هدف الدليل هو تبسيط المراجعة الأولية لإشارات المرور ومبادئ القيادة الآمنة. يقدم الموقع معلومات منظمة حسب الفئات لكي يجد المتعلم الدرس والاختبار المناسبين بسرعة.</p><h2>كيف نعمل</h2><p>نقسم المحتوى إلى فئات مرئية، ثم نعرض صورة الإشارة ومعناها وسلوكاً عملياً مقترحاً. بعد ذلك يستطيع الزائر اختبار نفسه في أسئلة قصيرة مع تصحيح فوري.</p><h2>مصادر الصور</h2><p>تظهر الصور الواقعية والرسومات المستخدمة لأغراض تعليمية فقط. يخصص الموقع صفحة لنسب الأصول ومصادرها المتاحة.</p><p><a class="button" href="ATTRIBUTION.md">عرض مصادر الصور</a></p></div></section>` }));
 
 write('contact.html', page({ title: 'اتصل بنا | دليل السياقة DZ', description: 'راسل دليل السياقة DZ لإرسال ملاحظة حول المحتوى أو اقتراح درس أو تصحيح معلومة.', file: 'contact.html', active: '', body: `${hero({ eyebrow: 'تواصل معنا', title: 'ملاحظتك تساعد على تحسين الدليل.', text: 'استخدم النموذج لإرسال اقتراح أو تصحيح يتعلق بالمحتوى التعليمي أو تجربة الموقع.' })}<section class="section section--white"><div class="container contact-grid"><aside class="contact-card"><h2>قبل الإرسال</h2><p>يرجى أن تكون الملاحظة محددة قدر الإمكان، وأن تذكر عنوان الصفحة أو الإشارة التي تتعلق بها.</p><ul class="contact-list"><li>اقتراح درس أو اختبار جديد</li><li>تصحيح محتوى أو رابط</li><li>ملاحظة عن سهولة الاستخدام</li></ul></aside><form class="contact-form" data-contact-form><h2>أرسل ملاحظتك</h2><div class="field"><label for="name">الاسم</label><input id="name" name="name" autocomplete="name" required></div><div class="field"><label for="email">البريد الإلكتروني</label><input id="email" name="email" type="email" autocomplete="email" required></div><div class="field"><label for="message">الرسالة</label><textarea id="message" name="message" required></textarea></div><button class="button" type="submit">إرسال الملاحظة</button><p class="form-message" aria-live="polite">تم استلام رسالتك في واجهة النموذج. يحتاج الإرسال الفعلي إلى ربط خدمة بريد أو نموذج خلفي قبل النشر.</p></form></div></section>` }));
 
-write('privacy.html', page({ title: 'سياسة الخصوصية | دليل السياقة DZ', description: 'سياسة الخصوصية الخاصة بموقع دليل السياقة DZ، بما في ذلك تعامل الموقع مع البيانات والنماذج وروابط الطرف الثالث.', file: 'privacy.html', active: '', body: `${hero({ eyebrow: 'الخصوصية', title: 'سياسة الخصوصية', text: 'يوضح هذا النص كيف يتعامل الموقع مع المعلومات التي قد يقدمها الزائر أثناء استخدامه للمنصة.' })}<section class="section section--white"><div class="container prose"><div class="notice"><p>آخر تحديث: ${year}. هذه صفحة معلومات عامة لموقع تعليمي ثابت، ويجب مراجعتها عند إضافة أي أدوات تحليل أو خدمات نماذج خارجية.</p></div><h2>المعلومات التي يقدمها الزائر</h2><p>لا يخزن الموقع الثابت معلومات شخصية من تلقاء نفسه. إذا جرى ربط نموذج الاتصال بخدمة خارجية لاحقاً، يجب توضيح البيانات المطلوبة والغرض منها في هذه السياسة قبل تفعيل الخدمة.</p><h2>ملفات الارتباط والقياس</h2><p>لا يضم الموقع في نسخته الحالية أداة قياس أو إعلانات أو ملفات ارتباط تحليلية مدمجة. قد تستخدم الاستضافة أو المنصات الخارجية ملفاتها وسياساتها الخاصة.</p><h2>الروابط الخارجية</h2><p>توجد روابط إلى مصادر صور ومراجع خارجية. عند الانتقال إليها تصبح خاضعاً لسياسة الخصوصية الخاصة بتلك المواقع.</p><h2>التحديثات</h2><p>يمكن تعديل هذه الصفحة عند تغيير طريقة تشغيل الموقع أو إضافة خدمات جديدة. استمرار استخدام الموقع بعد النشر يعني الاطلاع على النسخة الأحدث من السياسة.</p></div></section>` }));
+write('privacy.html', page({ title: 'سياسة الخصوصية | دليل السياقة DZ', description: 'سياسة الخصوصية الخاصة بموقع دليل السياقة DZ، بما في ذلك تعامل الموقع مع البيانات والنماذج وروابط الطرف الثالث.', file: 'privacy.html', active: '', body: `${hero({ eyebrow: 'الخصوصية', title: 'سياسة الخصوصية', text: 'يوضح هذا النص كيف يتعامل الموقع مع المعلومات التي قد يقدمها الزائر أثناء استخدامه للمنصة.' })}<section class="section section--white"><div class="container prose"><div class="notice"><p>آخر تحديث: ${year}. هذه صفحة معلومات عامة لموقع تعليمي ثابت، ويجب مراجعتها عند إضافة أي أدوات تحليل أو خدمات نماذج خارجية.</p></div><h2>المعلومات التي يقدمها الزائر</h2><p>لا يخزن الموقع الثابت معلومات شخصية من تلقاء نفسه. إذا جرى ربط نموذج الاتصال بخدمة خارجية لاحقاً، يجب توضيح البيانات المطلوبة والغرض منها في هذه السياسة قبل تفعيل الخدمة.</p><h2>الإعلانات وملفات الارتباط</h2><p>يستخدم الموقع وحدات Google AdSense لعرض الإعلانات. قد تستخدم Google وشركاؤها ملفات الارتباط أو معرّفات مشابهة لتخصيص الإعلانات وقياسها وفق إعدادات المستخدم وسياسات Google. لا يتحكم الموقع في ملفات الارتباط التي تضعها الأطراف الثالثة؛ راجع <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener noreferrer">سياسات إعلانات Google</a> وخيارات الخصوصية الخاصة بك.</p><h2>الروابط الخارجية</h2><p>توجد روابط إلى مصادر صور ومراجع خارجية. عند الانتقال إليها تصبح خاضعاً لسياسة الخصوصية الخاصة بتلك المواقع.</p><h2>التحديثات</h2><p>يمكن تعديل هذه الصفحة عند تغيير طريقة تشغيل الموقع أو إضافة خدمات جديدة. استمرار استخدام الموقع بعد النشر يعني الاطلاع على النسخة الأحدث من السياسة.</p></div></section>` }));
 
 write('disclaimer.html', page({ title: 'إخلاء المسؤولية | دليل السياقة DZ', description: 'إخلاء المسؤولية للمحتوى التعليمي في دليل السياقة DZ وحدود استخدام المعلومات والاختبارات المنشورة.', file: 'disclaimer.html', active: '', body: `${hero({ eyebrow: 'تنبيه مهم', title: 'إخلاء المسؤولية', text: 'المحتوى منشور للتوعية والمراجعة التعليمية، ولا يحل محل اللوائح الرسمية أو تعليمات الجهات المختصة.' })}<section class="section section--white"><div class="container prose"><h2>طبيعة المحتوى</h2><p>يقدم الموقع شروحات مبسطة وصوراً واختبارات قصيرة لمساعدة المتعلم على فهم أساسيات إشارات المرور والسلامة. لا يمثل الموقع جهة حكومية أو مدرسة سياقة رسمية.</p><h2>المسؤولية</h2><p>ينبغي للسائقين والمتعلمين اتباع اللوحات الفعلية على الطريق، والتوجيهات الرسمية، وقواعد التدريب والامتحانات السارية. قد تختلف التفاصيل التنظيمية أو تتغير، لذلك لا ينبغي الاعتماد على الموقع وحده لاتخاذ قرار قانوني أو تشغيلي.</p><h2>الصور والمراجع</h2><p>تستخدم صور الإشارات والنصوص لأغراض تعليمية مع توثيق الأصول المتاحة. كل علامة تجارية أو مادة تابعة لطرف ثالث تبقى ملكاً لأصحابها.</p><h2>الطوارئ</h2><p>في أي حالة طارئة، اتصل بالجهة المختصة مباشرة واتبع تعليماتها. لا تستخدم الموقع بديلاً عن خدمات الطوارئ أو الإرشاد الرسمي.</p></div></section>` }));
 

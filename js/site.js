@@ -187,3 +187,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
   renderExamSimulation();
 });
+
+// Progressive Web App: register only on secure origins and surface the browser install prompt when available.
+let deferredInstallPrompt;
+
+window.addEventListener('beforeinstallprompt', (event) => {
+  event.preventDefault();
+  deferredInstallPrompt = event;
+  const header = document.querySelector('.header-inner');
+  if (!header || header.querySelector('[data-pwa-install]')) return;
+  const installButton = document.createElement('button');
+  installButton.type = 'button';
+  installButton.className = 'pwa-install';
+  installButton.dataset.pwaInstall = 'true';
+  installButton.textContent = 'تثبيت التطبيق';
+  installButton.setAttribute('aria-label', 'تثبيت دليل السياقة DZ كتطبيق');
+  installButton.addEventListener('click', async () => {
+    if (!deferredInstallPrompt) return;
+    deferredInstallPrompt.prompt();
+    await deferredInstallPrompt.userChoice;
+    deferredInstallPrompt = null;
+    installButton.remove();
+  });
+  header.append(installButton);
+});
+
+window.addEventListener('appinstalled', () => {
+  document.querySelector('[data-pwa-install]')?.remove();
+  deferredInstallPrompt = null;
+});
+
+if ('serviceWorker' in navigator && window.isSecureContext) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('service-worker.js', { scope: './' }).catch(() => {
+      // The site stays fully usable online if registration is unavailable.
+    });
+  });
+}
