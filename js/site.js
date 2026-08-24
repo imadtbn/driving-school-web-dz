@@ -203,6 +203,43 @@ function renderExamSimulation() {
   renderIntro();
 }
 
+function initSignGallery() {
+  const gallery = document.querySelector('[data-sign-gallery]');
+  const search = document.querySelector('[data-gallery-search]');
+  const filters = [...document.querySelectorAll('[data-gallery-filter]')];
+  const count = document.querySelector('[data-gallery-count]');
+  const empty = document.querySelector('[data-gallery-empty]');
+  if (!gallery || !search || !filters.length || !count || !empty) return;
+
+  const cards = [...gallery.querySelectorAll('[data-sign-card]')];
+  let activeCategory = 'all';
+  const normalize = (value) => value.toLocaleLowerCase('ar-DZ').trim();
+  const refresh = () => {
+    const query = normalize(search.value);
+    let visible = 0;
+    cards.forEach((card) => {
+      const matchesCategory = activeCategory === 'all' || card.dataset.category === activeCategory;
+      const matchesQuery = !query || normalize(card.dataset.search || '').includes(query);
+      const show = matchesCategory && matchesQuery;
+      card.hidden = !show;
+      if (show) visible += 1;
+    });
+    count.textContent = new Intl.NumberFormat('ar-DZ').format(visible);
+    empty.hidden = visible !== 0;
+  };
+
+  search.addEventListener('input', refresh);
+  filters.forEach((filter) => filter.addEventListener('click', () => {
+    activeCategory = filter.dataset.galleryFilter || 'all';
+    filters.forEach((item) => {
+      const selected = item === filter;
+      item.classList.toggle('is-active', selected);
+      item.setAttribute('aria-pressed', String(selected));
+    });
+    refresh();
+  }));
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const toggle = document.querySelector('.menu-toggle');
   const nav = document.querySelector('.primary-nav');
@@ -225,6 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   renderDynamicStats();
+  initSignGallery();
 
   const quiz = document.querySelector('[data-quiz]');
   if (quiz) renderQuiz(quiz.dataset.quiz);
