@@ -1,4 +1,4 @@
-const CACHE_NAME = 'driving-school-dz-v6';
+const CACHE_NAME = 'driving-school-dz-v7';
 const OFFLINE_PAGE = './offline.html';
 const PRECACHE_URLS = [
   './',
