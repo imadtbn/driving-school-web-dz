@@ -1,11 +1,11 @@
-const CACHE_NAME = 'driving-school-dz-v7';
+const CACHE_NAME = 'driving-school-dz-v8';
 const OFFLINE_PAGE = './offline.html';
 const PRECACHE_URLS = [
   './',
   './index.html', './signals.html', './warning-signs.html', './prohibition-signs.html', './mandatory-signs.html', './information-signs.html',
   './rules.html', './safety.html', './quiz.html', './quiz-warning.html', './quiz-prohibition.html', './quiz-mandatory.html', './quiz-information.html',
   './exam-simulation.html', './faq-road-law.html', './about.html', './contact.html', './privacy.html', './disclaimer.html', './sources.html', './offline.html',
-  './css/style.css', './js/site.js', './site.webmanifest', './assets/favicon.svg', './assets/icon-192.png', './assets/icon-512.png', './assets/social-cover.png',
+  './css/style.css', './js/site.js', './js/site-tags.js', './assets/favicon.svg', './assets/icon-192.png', './assets/icon-512.png', './assets/social-cover.png',
   './assets/images/algerian-stop-sign.jpg', './assets/images/rules-driving-hero.webp', './assets/images/safety-driving-hero.webp',
   './assets/signs/algeria-road-sign-e1.svg', './assets/signs/warning-a1a.svg', './assets/signs/regulatory-c11a-50.svg', './assets/signs/regulatory-d1a.svg',
   './assets/illustrations/rules-distance.svg', './assets/illustrations/rules-focus.svg', './assets/illustrations/rules-lane.svg', './assets/illustrations/rules-night.svg',
