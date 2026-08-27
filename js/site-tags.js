@@ -7,8 +7,8 @@
   'use strict';
 
   const CONFIG = Object.freeze({
-    gtmId: '',
-    ga4Id: '',
+    gtmId: 'GTM-TQDB7NL9',
+    ga4Id: 'G-HCLS25SLPP',
     clarityId: '',
     adsenseClient: 'ca-pub-5656416032906373',
     adSlots: {

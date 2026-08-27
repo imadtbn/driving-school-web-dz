@@ -4,18 +4,18 @@
 
 يستدعي كل ملف HTML ضمن صفحات الموقع التعليمية `js/site-tags.js` مرة واحدة في رأس الصفحة. صفحة `offline.html` مستثناة عمداً لأنها تعمل دون اتصال ولا ينبغي أن تطلب أي خدمة خارجية. لا يحتوي HTML على روابط تحميل مباشرة إلى GTM أو Google Analytics أو AdSense أو Microsoft Clarity.
 
-> يبقى `js/site-tags.js` هو **المصدر الوحيد** لمعرّف الناشر، أرقام وحدات AdSense، ومعرّفات القياس المستقبلية.
+> يبقى `js/site-tags.js` هو **المصدر الوحيد** لمعرّفات القياس والناشر وأرقام وحدات AdSense. ويولّد `build-site.js` إطار GTM غير البرمجي مرة واحدة داخل كل صفحة محتوى عند وجود معرّف GTM صحيح.
 
 | الخدمة | موقع الإعداد | الحالة الحالية | السلوك |
 | --- | --- | --- | --- |
-| Google Tag Manager | `CONFIG.gtmId`، السطر 10 | فارغ | لا يُحمّل أي سكربت GTM. |
-| Google Analytics 4 | `CONFIG.ga4Id`، السطر 11 | فارغ | لا يُحمّل `gtag.js` ولا يرسل أحداثاً. |
+| Google Tag Manager | `CONFIG.gtmId`، السطر 10 | مفعّل: `GTM-TQDB7NL9` | يحمّل `gtm.js` مرة واحدة عبر المحمل المركزي، مع إطار `noscript` واحد في القالب. |
+| Google Analytics 4 | `CONFIG.ga4Id`، السطر 11 | محفوظ: `G-HCLS25SLPP` | لا يُحمّل `gtag.js` مباشرة ما دام GTM مفعّلاً؛ ينبغي إدارة GA4 من داخل الحاوية. |
 | Microsoft Clarity | `CONFIG.clarityId`، السطر 12 | فارغ | لا يُحمّل Clarity. |
 | Google AdSense | `CONFIG.adsenseClient` و`CONFIG.adSlots`، الأسطر 13–24 | مفعّل | يُحمّل عند وجود وحدة إعلان معرفة في الصفحة فقط. |
 
-## تفعيل القياس مستقبلاً
+## تشغيل GA4 بصورة صحيحة
 
-عند تزويد معرّف GTM صحيحاً، املأ `gtmId` فقط ثم أضف إعدادَي GA4 وClarity داخل حاوية GTM. عندها يجب ترك `ga4Id` و`clarityId` فارغين حتى لا يتكرر القياس. وإذا لم يُستخدم GTM، يمكن ملء `ga4Id` أو `clarityId` كلٌ على حدة؛ يتحقق المحمل من صحة الشكل قبل إنشاء أي طلب خارجي.
+بما أن GTM مفعّل، فهو المسار الوحيد الذي يجب أن ينشئ Google Analytics 4. أضف أو راجع علامة **Google tag / Google Analytics: GA4 Configuration** داخل حاوية `GTM-TQDB7NL9`، واضبط معرّف القياس على `G-HCLS25SLPP`، ثم انشر إصدار الحاوية من Google Tag Manager. لا تضف كود `gtag.js` أو `gtag('config')` مباشراً إلى الموقع؛ سيمنع المحمل هذا المسار عند وجود GTM لتفادي `page_view` المزدوج.
 
 ## سياسة مواضع الإعلانات
 
@@ -42,4 +42,4 @@ node tests/tag-centralizer.test.js
 python3 /home/ubuntu/skills/analytics-tags-centralizer/scripts/audit_tags.py . --strict --exclude 'google*.html' --exclude 'yandex_*.html'
 ```
 
-تتضمن `tests/manual-browser-checks.md` نتائج معاينة محلية لصفحة تعليمية وصفحة محاكاة وفحص ذاكرة PWA `driving-school-dz-v8`.
+تتضمن `tests/manual-browser-checks.md` نتائج معاينة محلية لصفحة تعليمية وصفحة محاكاة وفحص ذاكرة PWA. بعد تفعيل GTM، ينبغي التحقق من النسخة المنشورة عبر GTM Preview وGA4 DebugView، لأن إعداد الحاوية نفسه لا يمكن تأكيده من ملفات الموقع الثابتة.

@@ -6,6 +6,8 @@ const siteUrl = 'https://imadtbn.github.io/driving-school-web-dz';
 const year = new Date().getFullYear();
 const officialRoadLawUrl = 'https://www.joradp.dz/FTP/jo-arabe/2026/A2026036.pdf';
 const apsRoadLawUrl = 'https://www.aps.dz/fr/algerie/actualite-nationale/mpekq33o-publication-de-la-loi-portant-code-de-la-route';
+const centralTagsSource = fs.readFileSync(path.join(root, 'js', 'site-tags.js'), 'utf8');
+const gtmId = (centralTagsSource.match(/gtmId:\s*'([^']*)'/) || [])[1] || '';
 
 // يحدد هذا الجدول موضع إعلان واحد غير متطفل في الصفحات التعليمية فقط.
 function adSlotFor(file) {
@@ -24,6 +26,12 @@ function adUnit(file) {
   const slot = adSlotFor(file);
   if (!slot) return '';
   return `<aside class="ad-placement ad-placement--${slot}" aria-label="محتوى إعلاني"><p>محتوى إعلاني</p><ins class="adsbygoogle" data-adsense-slot="${slot}" style="display:block"></ins></aside>`;
+}
+
+function gtmNoscript() {
+  if (!/^GTM-[A-Z0-9]+$/i.test(gtmId)) return '';
+  const src = `https://www.googletagmanager.com/ns.html?id=${encodeURIComponent(gtmId)}`;
+  return `<noscript><iframe src="${src}" height="0" width="0" style="display:none;visibility:hidden" title="Google Tag Manager"></iframe></noscript>`;
 }
 const faqItems = [
   { question: 'ما هو قانون المرور الجديد في الجزائر؟', answer: 'هو القانون رقم 26-09 المؤرخ في 12 مايو 2026 والمتضمن قانون المرور، والمنشور في الجريدة الرسمية للجمهورية الجزائرية، العدد 36 لسنة 2026.', source: officialRoadLawUrl },
@@ -127,6 +135,7 @@ function head({ title, description, file, type = 'website' }) {
   <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
   <meta name="theme-color" content="#063d29">
   <meta name="author" content="دليل السياقة DZ">
+  <meta name="google-site-verification" content="f5Xi4oFx0v5dN6iPZd9qCw-7vnc3vIbAeYF9jr4vwVM">
   <link rel="canonical" href="${canonical}">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="assets/favicon.svg">
@@ -156,6 +165,7 @@ function head({ title, description, file, type = 'website' }) {
 function page({ title, description, file, active, body, type }) {
   return `${head({ title, description, file, type })}
 <body>
+${gtmNoscript()}
 ${header(active)}
 <main id="main-content" tabindex="-1">${body}</main>
 ${adUnit(file)}
@@ -272,7 +282,7 @@ write('about.html', page({ title: 'من نحن | دليل السياقة DZ', de
 
 write('contact.html', page({ title: 'اتصل بنا | دليل السياقة DZ', description: 'راسل دليل السياقة DZ لإرسال ملاحظة حول المحتوى أو اقتراح درس أو تصحيح معلومة.', file: 'contact.html', active: '', body: `${hero({ eyebrow: 'تواصل معنا', title: 'ملاحظتك تساعد على تحسين الدليل.', text: 'استخدم النموذج لإرسال اقتراح أو تصحيح يتعلق بالمحتوى التعليمي أو تجربة الموقع.' })}<section class="section section--white"><div class="container contact-grid"><aside class="contact-card"><h2>قبل الإرسال</h2><p>يرجى أن تكون الملاحظة محددة قدر الإمكان، وأن تذكر عنوان الصفحة أو الإشارة التي تتعلق بها.</p><ul class="contact-list"><li>اقتراح درس أو اختبار جديد</li><li>تصحيح محتوى أو رابط</li><li>ملاحظة عن سهولة الاستخدام</li></ul></aside><form class="contact-form" data-contact-form><h2>أرسل ملاحظتك</h2><div class="field"><label for="name">الاسم</label><input id="name" name="name" autocomplete="name" required></div><div class="field"><label for="email">البريد الإلكتروني</label><input id="email" name="email" type="email" autocomplete="email" required></div><div class="field"><label for="message">الرسالة</label><textarea id="message" name="message" required></textarea></div><button class="button" type="submit">إرسال الملاحظة</button><p class="form-message" aria-live="polite">تم استلام رسالتك في واجهة النموذج. يحتاج الإرسال الفعلي إلى ربط خدمة بريد أو نموذج خلفي قبل النشر.</p></form></div></section>` }));
 
-write('privacy.html', page({ title: 'سياسة الخصوصية | دليل السياقة DZ', description: 'سياسة الخصوصية الخاصة بموقع دليل السياقة DZ، بما في ذلك تعامل الموقع مع البيانات والنماذج وروابط الطرف الثالث.', file: 'privacy.html', active: '', body: `${hero({ eyebrow: 'الخصوصية', title: 'سياسة الخصوصية', text: 'يوضح هذا النص كيف يتعامل الموقع مع المعلومات التي قد يقدمها الزائر أثناء استخدامه للمنصة.' })}<section class="section section--white"><div class="container prose"><div class="notice"><p>آخر تحديث: ${year}. هذه صفحة معلومات عامة لموقع تعليمي ثابت، ويجب مراجعتها عند إضافة أي أدوات تحليل أو خدمات نماذج خارجية.</p></div><h2>المعلومات التي يقدمها الزائر</h2><p>لا يخزن الموقع الثابت معلومات شخصية من تلقاء نفسه. إذا جرى ربط نموذج الاتصال بخدمة خارجية لاحقاً، يجب توضيح البيانات المطلوبة والغرض منها في هذه السياسة قبل تفعيل الخدمة.</p><h2>الإعلانات وملفات الارتباط</h2><p>قد يعرض الموقع وحدات Google AdSense في بعض الصفحات التعليمية. قد تستخدم Google وشركاؤها ملفات ارتباط أو معرّفات مشابهة لتخصيص الإعلانات وقياسها وفق إعدادات المستخدم وسياسات Google. لا يتحكم الموقع في ملفات الارتباط التي تضعها الأطراف الثالثة؛ راجع <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener noreferrer">سياسات إعلانات Google</a> وخيارات الخصوصية الخاصة بك.</p><h2>الروابط الخارجية</h2><p>توجد روابط إلى مصادر صور ومراجع خارجية. عند الانتقال إليها تصبح خاضعاً لسياسة الخصوصية الخاصة بتلك المواقع.</p><h2>التحديثات</h2><p>يمكن تعديل هذه الصفحة عند تغيير طريقة تشغيل الموقع أو إضافة خدمات جديدة. استمرار استخدام الموقع بعد النشر يعني الاطلاع على النسخة الأحدث من السياسة.</p></div></section>` }));
+write('privacy.html', page({ title: 'سياسة الخصوصية | دليل السياقة DZ', description: 'سياسة الخصوصية الخاصة بموقع دليل السياقة DZ، بما في ذلك تعامل الموقع مع البيانات والنماذج وروابط الطرف الثالث.', file: 'privacy.html', active: '', body: `${hero({ eyebrow: 'الخصوصية', title: 'سياسة الخصوصية', text: 'يوضح هذا النص كيف يتعامل الموقع مع المعلومات التي قد يقدمها الزائر أثناء استخدامه للمنصة.' })}<section class="section section--white"><div class="container prose"><div class="notice"><p>آخر تحديث: ${year}. هذه صفحة معلومات عامة لموقع تعليمي ثابت، ويجب مراجعتها عند إضافة أي أدوات تحليل أو خدمات نماذج خارجية.</p></div><h2>المعلومات التي يقدمها الزائر</h2><p>لا يخزن الموقع الثابت معلومات شخصية من تلقاء نفسه. إذا جرى ربط نموذج الاتصال بخدمة خارجية لاحقاً، يجب توضيح البيانات المطلوبة والغرض منها في هذه السياسة قبل تفعيل الخدمة.</p><h2>القياس وإدارة الوسوم</h2><p>يستخدم الموقع Google Tag Manager لإدارة أدوات القياس، ومنها Google Analytics 4 عند ضبطها داخل الحاوية. قد تجمع هذه الأدوات بيانات استخدام مجمعة مثل الصفحات التي تمت زيارتها ومعلومات تقنية عامة وفق إعداداتها وسياسات Google. لا يضع الموقع كود Google Analytics مستقلاً بجانب Tag Manager، لتفادي تكرار القياس.</p><h2>الإعلانات وملفات الارتباط</h2><p>قد يعرض الموقع وحدات Google AdSense في بعض الصفحات التعليمية. قد تستخدم Google وشركاؤها ملفات ارتباط أو معرّفات مشابهة لتخصيص الإعلانات وقياسها وفق إعدادات المستخدم وسياسات Google. لا يتحكم الموقع في ملفات الارتباط التي تضعها الأطراف الثالثة؛ راجع <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener noreferrer">سياسات إعلانات Google</a> وخيارات الخصوصية الخاصة بك.</p><h2>الروابط الخارجية</h2><p>توجد روابط إلى مصادر صور ومراجع خارجية. عند الانتقال إليها تصبح خاضعاً لسياسة الخصوصية الخاصة بتلك المواقع.</p><h2>التحديثات</h2><p>يمكن تعديل هذه الصفحة عند تغيير طريقة تشغيل الموقع أو إضافة خدمات جديدة. استمرار استخدام الموقع بعد النشر يعني الاطلاع على النسخة الأحدث من السياسة.</p></div></section>` }));
 
 write('disclaimer.html', page({ title: 'إخلاء المسؤولية | دليل السياقة DZ', description: 'إخلاء المسؤولية للمحتوى التعليمي في دليل السياقة DZ وحدود استخدام المعلومات والاختبارات المنشورة.', file: 'disclaimer.html', active: '', body: `${hero({ eyebrow: 'تنبيه مهم', title: 'إخلاء المسؤولية', text: 'المحتوى منشور للتوعية والمراجعة التعليمية، ولا يحل محل اللوائح الرسمية أو تعليمات الجهات المختصة.' })}<section class="section section--white"><div class="container prose"><h2>طبيعة المحتوى</h2><p>يقدم الموقع شروحات مبسطة وصوراً واختبارات قصيرة لمساعدة المتعلم على فهم أساسيات إشارات المرور والسلامة. لا يمثل الموقع جهة حكومية أو مدرسة سياقة رسمية.</p><h2>المسؤولية</h2><p>ينبغي للسائقين والمتعلمين اتباع اللوحات الفعلية على الطريق، والتوجيهات الرسمية، وقواعد التدريب والامتحانات السارية. قد تختلف التفاصيل التنظيمية أو تتغير، لذلك لا ينبغي الاعتماد على الموقع وحده لاتخاذ قرار قانوني أو تشغيلي.</p><h2>الصور والمراجع</h2><p>تستخدم صور الإشارات والنصوص لأغراض تعليمية مع توثيق الأصول المتاحة. كل علامة تجارية أو مادة تابعة لطرف ثالث تبقى ملكاً لأصحابها.</p><h2>الطوارئ</h2><p>في أي حالة طارئة، اتصل بالجهة المختصة مباشرة واتبع تعليماتها. لا تستخدم الموقع بديلاً عن خدمات الطوارئ أو الإرشاد الرسمي.</p></div></section>` }));
 
